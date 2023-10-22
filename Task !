@@ -1,0 +1,78 @@
+using UnityEngine;
+using UnityEngine.UI;
+using DG.Tweening;
+
+public class ClientList : MonoBehaviour
+{
+    [SerializeField] private Dropdown filterDropdown;
+    [SerializeField] private GameObject clientPrefab;
+    [SerializeField] private Transform clientListParent;
+    [SerializeField] private GameObject clientDetailsPopup;
+
+    private List<Client> clients = new List<Client>();
+
+    private void Start()
+    {
+        // Populate the clients list from your JSON data
+
+        // Set up the dropdown
+        filterDropdown.options.Clear();
+        filterDropdown.options.Add(new Dropdown.OptionData("All Clients"));
+        filterDropdown.options.Add(new Dropdown.OptionData("Managers Only"));
+        filterDropdown.options.Add(new Dropdown.OptionData("Non-Managers"));
+        filterDropdown.onValueChanged.AddListener(FilterClients);
+        
+        DisplayClients();
+    }
+
+    private void DisplayClients()
+    {
+        // Clear the current list
+        foreach (Transform child in clientListParent)
+        {
+            Destroy(child.gameObject);
+        }
+
+        // Display each client
+        foreach (Client client in clients)
+        {
+            GameObject clientGO = Instantiate(clientPrefab, clientListParent);
+            clientGO.GetComponentInChildren<Text>().text = client.label + " - " + client.points;
+            clientGO.GetComponent<Button>().onClick.AddListener(() => ShowClientDetails(client));
+            clientGO.transform.DOScale(1, 0.3f).From(0);  // Simple scale animation with DOTween
+        }
+    }
+
+    private void FilterClients(int index)
+    {
+        switch (index)
+        {
+            case 0:  // All Clients
+                clients = GetAllClients();
+                break;
+            case 1:  // Managers Only
+                clients = GetManagers();
+                break;
+            case 2:  // Non-Managers
+                clients = GetNonManagers();
+                break;
+        }
+
+        DisplayClients();
+    }
+
+    private void ShowClientDetails(Client client)
+    {
+        // Populate the popup with the client's details
+        clientDetailsPopup.transform.Find("Name").GetComponent<Text>().text = client.name;
+        clientDetailsPopup.transform.Find("Points").GetComponent<Text>().text = client.points.ToString();
+        clientDetailsPopup.transform.Find("Address").GetComponent<Text>().text = client.address;
+
+        // Show the popup with a simple fade animation
+        CanvasGroup canvasGroup = clientDetailsPopup.GetComponent<CanvasGroup>();
+        canvasGroup.alpha = 0;
+        canvasGroup.DOFade(1, 0.3f);
+        
+        clientDetailsPopup.SetActive(true);
+    }
+}
