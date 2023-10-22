@@ -1,0 +1,64 @@
+using UnityEngine;
+using UnityEngine.UI;
+using DG.Tweening;
+using System.Collections.Generic;
+
+public class CircleSpawner : MonoBehaviour
+{
+    [SerializeField] private GameObject circlePrefab;
+    [SerializeField] private Button restartButton;
+    private List<GameObject> circles = new List<GameObject>();
+
+    private void Start()
+    {
+        restartButton.onClick.AddListener(Restart);
+        SpawnCircles();
+    }
+
+    private void SpawnCircles()
+    {
+        int numCircles = Random.Range(5, 11);
+        for (int i = 0; i < numCircles; i++)
+        {
+            GameObject circle = Instantiate(circlePrefab, RandomScreenPosition(), Quaternion.identity);
+            circles.Add(circle);
+        }
+    }
+
+    private Vector3 RandomScreenPosition()
+    {
+        return new Vector3(Random.Range(0, Screen.width), Random.Range(0, Screen.height), 0);
+    }
+
+    private void Update()
+    {
+        if (Input.GetMouseButtonUp(0))
+        {
+            CheckCircleIntersections();
+        }
+    }
+
+    private void CheckCircleIntersections()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        foreach (GameObject circle in circles)
+        {
+            Collider2D collider = circle.GetComponent<Collider2D>();
+            if (collider.Raycast(ray.origin, ray.direction, Mathf.Infinity))
+            {
+                Destroy(circle);
+                circles.Remove(circle);
+            }
+        }
+    }
+
+    private void Restart()
+    {
+        foreach (GameObject circle in circles)
+        {
+            Destroy(circle);
+        }
+        circles.Clear();
+        SpawnCircles();
+    }
+}
