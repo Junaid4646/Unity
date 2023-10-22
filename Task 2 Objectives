@@ -1,0 +1,9 @@
+This script should be attached to an empty GameObject in your scene. The circlePrefab field should be a reference to a prefab representing a circle. The restartButton field should be a reference to a UI Button that will restart the game when clicked.
+
+The SpawnCircles method spawns a random number of circles at random positions on the screen. The CheckCircleIntersections method checks if the mouse cursor intersects with any of the circles when the mouse button is released, and destroys any that it does. The Restart method destroys all existing circles and spawns new ones.
+
+Remember to import the DOTween namespace at the top of your script and also to install DOTween through Unity’s package manager for animations.
+
+Please note that this is a simplified example and doesn’t include things like animations or handling screen resizing. You’ll need to add those in yourself based on your specific project requirements.
+
+
